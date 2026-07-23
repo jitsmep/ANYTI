@@ -1,4 +1,6 @@
-import React from 'react'
+'use client'
+
+import React, { useState } from 'react'
 
 const contactLinks = [
   {
@@ -45,7 +47,53 @@ const contactLinks = [
   },
 ]
 
+type FormStatus = 'idle' | 'sending' | 'success' | 'error'
+
 export default function Contact() {
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [message, setMessage] = useState('')
+  const [status, setStatus] = useState<FormStatus>('idle')
+  const [errorMsg, setErrorMsg] = useState('')
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setStatus('sending')
+    setErrorMsg('')
+
+    const formspreeUrl = process.env.NEXT_PUBLIC_FORMSPREE_URL
+
+    try {
+      const res = await fetch(formspreeUrl as string, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({ name, email, message }),
+      })
+
+      if (res.ok) {
+        setStatus('success')
+        setName('')
+        setEmail('')
+        setMessage('')
+      } else {
+        const data = await res.json().catch(() => ({}))
+        setErrorMsg(
+          data?.errors?.[0]?.message ?? 'Something went wrong. Please try again.'
+        )
+        setStatus('error')
+      }
+    } catch {
+      setErrorMsg('Network error. Please check your connection and try again.')
+      setStatus('error')
+    }
+  }
+
+  const inputBase =
+    'w-full rounded-xl bg-slate-800/60 border border-slate-700/60 text-white placeholder-slate-500 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/70 focus:border-violet-500/60 transition-all duration-200'
+
   return (
     <section id="contact" className="py-24 bg-slate-900 text-white">
       <div className="max-w-3xl mx-auto px-6">
@@ -57,6 +105,124 @@ export default function Contact() {
           <p className="mt-6 text-slate-400 text-base max-w-xl mx-auto leading-relaxed">
             I&apos;m open to internship opportunities, collaborations, and interesting projects. Feel free to reach out!
           </p>
+        </div>
+
+        {/* Contact form */}
+        <div className="mb-10 rounded-2xl border border-slate-700/50 bg-slate-800/30 p-6 sm:p-8 backdrop-blur-sm">
+          {status === 'success' ? (
+            <div className="flex flex-col items-center justify-center py-10 text-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-violet-500/20 border border-violet-500/40 flex items-center justify-center">
+                <svg className="w-7 h-7 text-violet-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <p className="text-white font-semibold text-lg">Thanks! I&apos;ll get back to you soon.</p>
+              <p className="text-slate-400 text-sm">Your message has been sent successfully.</p>
+              <button
+                onClick={() => setStatus('idle')}
+                className="mt-2 text-violet-400 hover:text-violet-300 text-sm underline underline-offset-2 transition-colors"
+              >
+                Send another message
+              </button>
+            </div>
+          ) : (
+            <form id="contact-form" onSubmit={handleSubmit} noValidate className="space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                {/* Name */}
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="contact-name" className="text-xs text-slate-400 uppercase tracking-wider font-medium">
+                    Name <span className="text-violet-400">*</span>
+                  </label>
+                  <input
+                    id="contact-name"
+                    type="text"
+                    required
+                    placeholder="Your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className={inputBase}
+                    disabled={status === 'sending'}
+                  />
+                </div>
+
+                {/* Email */}
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="contact-email-input" className="text-xs text-slate-400 uppercase tracking-wider font-medium">
+                    Email <span className="text-violet-400">*</span>
+                  </label>
+                  <input
+                    id="contact-email-input"
+                    type="email"
+                    required
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={inputBase}
+                    disabled={status === 'sending'}
+                  />
+                </div>
+              </div>
+
+              {/* Message */}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="contact-message" className="text-xs text-slate-400 uppercase tracking-wider font-medium">
+                  Message <span className="text-violet-400">*</span>
+                </label>
+                <textarea
+                  id="contact-message"
+                  required
+                  rows={5}
+                  placeholder="Tell me what's on your mind…"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className={`${inputBase} resize-none`}
+                  disabled={status === 'sending'}
+                />
+              </div>
+
+              {/* Error banner */}
+              {status === 'error' && (
+                <div className="flex items-start gap-3 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                  <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                  </svg>
+                  <span>{errorMsg}</span>
+                </div>
+              )}
+
+              {/* Submit button */}
+              <button
+                id="contact-submit"
+                type="submit"
+                disabled={status === 'sending'}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold px-8 py-3 text-sm transition-all duration-200 shadow-md hover:shadow-violet-500/25 hover:scale-[1.02] active:scale-[0.98]"
+              >
+                {status === 'sending' ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z" />
+                    </svg>
+                    Sending…
+                  </>
+                ) : (
+                  <>
+                    Send Message
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                    </svg>
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+        </div>
+
+        {/* Divider */}
+        <div className="flex items-center gap-4 mb-10">
+          <div className="flex-1 h-px bg-slate-700/60" />
+          <p className="text-slate-500 text-xs uppercase tracking-widest">or reach me directly</p>
+          <div className="flex-1 h-px bg-slate-700/60" />
         </div>
 
         {/* Contact cards */}

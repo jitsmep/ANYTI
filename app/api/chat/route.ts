@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import Groq from 'groq-sdk'
 
 const SYSTEM_PROMPT = `You are a friendly and concise AI assistant on Joshuva P's personal portfolio website. Your job is to answer visitor questions about Joshuva accurately, warmly, and briefly. Never make things up — if you don't know something, say so honestly.
 
@@ -45,7 +46,7 @@ Currently Learning: AI Full-stack Web Development, Bot Development, API Integrat
 == TONE GUIDELINES ==
 - Be friendly, warm, and conversational
 - Keep answers concise (2–4 sentences unless more detail is requested)
-- Use first/second person naturally ("Joshuva built..." or "He is currently studying...")
+- Use third person naturally ("Joshuva built..." or "He is currently studying...")
 - If asked something not covered above, say: "I don't have that information — feel free to email Joshuva directly at pjoshuva31@gmail.com!"
 `
 
@@ -54,50 +55,44 @@ export async function POST(req: NextRequest) {
     const { messages } = await req.json()
 
     if (!messages || !Array.isArray(messages)) {
-      return NextResponse.json({ error: 'Invalid request: messages array required.' }, { status: 400 })
+      return NextResponse.json(
+        { reply: 'Invalid request: messages array required.' },
+        { status: 400 }
+      )
     }
 
-    // Build messages array with system prompt
-    const payload = {
-      model: 'gemini-2.0-flash',
-      systemInstruction: {
-        parts: [{ text: SYSTEM_PROMPT }],
-      },
-      contents: messages.map((m: { role: string; content: string }) => ({
-        role: m.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: m.content }],
-      })),
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 512,
-      },
-    }
-
-    const apiKey = process.env.GEMINI_API_KEY
+    const apiKey = process.env.GROQ_API_KEY
     if (!apiKey) {
-      return NextResponse.json({ error: 'API key not configured.' }, { status: 500 })
+      console.error('GROQ_API_KEY is not set.')
+      return NextResponse.json(
+        { reply: "The chatbot isn't configured yet. Please try again later." },
+        { status: 500 }
+      )
     }
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      }
-    )
+    const groq = new Groq({ apiKey })
 
-    if (!response.ok) {
-      const err = await response.text()
-      return NextResponse.json({ error: `API error: ${err}` }, { status: response.status })
-    }
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        ...messages.map((m: { role: string; content: string }) => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+        })),
+      ],
+      temperature: 0.7,
+      max_tokens: 512,
+    })
 
-    const data = await response.json()
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? 'Sorry, I could not generate a response.'
+    const reply = completion.choices[0]?.message?.content ?? "Sorry, I couldn't generate a response."
 
-    return NextResponse.json({ message: text })
+    return NextResponse.json({ reply })
   } catch (error) {
     console.error('Chat route error:', error)
-    return NextResponse.json({ error: 'Internal server error.' }, { status: 500 })
+    return NextResponse.json(
+      { reply: "Something went wrong on my end. Please try again in a moment." },
+      { status: 500 }
+    )
   }
 }
