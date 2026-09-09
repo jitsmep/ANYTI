@@ -241,7 +241,12 @@ function ClassicContact() {
             </div>
           </a>
           {BIO.linkedin && (
-            <a href={BIO.linkedin} target="_blank" rel="noopener noreferrer" className="classic-contact-pill">
+            <a
+              href={BIO.linkedin.startsWith("http") ? BIO.linkedin : `https://${BIO.linkedin}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="classic-contact-pill"
+            >
               <span className="classic-contact-pill-icon">💼</span>
               <div>
                 <p className="classic-contact-pill-label">LinkedIn</p>

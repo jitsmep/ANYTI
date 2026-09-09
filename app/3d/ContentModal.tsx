@@ -196,7 +196,12 @@ function ContactContent() {
           🐙 github.com/jitsmep
         </a>
         {BIO.linkedin && (
-          <a href={BIO.linkedin} target="_blank" rel="noopener noreferrer" className="contact-link-pill">
+          <a
+            href={BIO.linkedin.startsWith("http") ? BIO.linkedin : `https://${BIO.linkedin}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="contact-link-pill"
+          >
             💼 LinkedIn
           </a>
         )}

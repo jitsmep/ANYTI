@@ -7,7 +7,7 @@ export const BIO = {
   tagline: "BSc Computer Science student crafting practical tools — from finance trackers to full-stack web apps — entirely through code.",
   email: "pjoshuva31@gmail.com",
   github: "https://github.com/jitsmep",
-  linkedin: "www.linkedin.com/in/j0shuva", // ← will be updated once user provides URL
+  linkedin: "https://www.linkedin.com/in/j0shuva",
   openToWork: true,
   education: "BSc Computer Science · Madras Christian College · 2027",
 }
