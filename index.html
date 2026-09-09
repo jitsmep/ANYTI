@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Joshuva P — Vibe Coder & AI Developer</title>
+  <meta name="description" content="Portfolio of Joshuva P — Technology & AI Enthusiast, Vibe Coder building full-stack web apps, finance trackers, and smart tools with AI." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════ LOADER ══════════════════════════════ -->
+  <div id="loader">
+    <div class="loader-inner">
+      <div class="loader-blob"></div>
+      <div class="loader-text">
+        <span class="lt-0">joshuva</span>
+        <span class="lt-1">.p</span>
+        <span class="lt-2">vibe</span>
+        <span class="lt-3">coder</span>
+        <span class="lt-4">loading</span>
+        <span class="lt-5">✦</span>
+      </div>
+      <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ CURSOR ══════════════════════════════ -->
+  <div id="cursor-ring"></div>
+  <div id="cursor-dot"></div>
+  <div id="cursor-label"></div>
+
+  <!-- ══════════════════════════════ NAV ══════════════════════════════ -->
+  <header id="nav">
+    <a href="#" class="nav-logo" id="logo-link">joshuva<span class="logo-dot">.p</span></a>
+    <nav class="nav-links">
+      <a href="#work" class="nav-link" data-cursor="projects">Projects</a>
+      <a href="#process" class="nav-link" data-cursor="skills">Skills</a>
+      <a href="#about" class="nav-link" data-cursor="about">About</a>
+      <a href="#contact" class="nav-link cta-nav" id="hire-btn" data-cursor="contact">Get in Touch →</a>
+    </nav>
+    <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span>
+    </button>
+  </header>
+
+  <!-- Mobile nav -->
+  <div class="mobile-nav" id="mobile-nav">
+    <a href="#work" class="mobile-link">Projects</a>
+    <a href="#process" class="mobile-link">Skills</a>
+    <a href="#about" class="mobile-link">About</a>
+    <a href="#contact" class="mobile-link">Get in Touch</a>
+  </div>
+
+  <main>
+
+    <!-- ══════════════════════════════ HERO ══════════════════════════════ -->
+    <section id="hero">
+
+      <!-- Doodle blobs -->
+      <div class="blob blob-1" data-parallax="0.05"></div>
+      <div class="blob blob-2" data-parallax="0.08"></div>
+      <div class="blob blob-3" data-parallax="0.03"></div>
+
+      <!-- Floating doodles -->
+      <svg class="doodle doodle-squiggle d1" viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg" data-parallax="0.12">
+        <path d="M5 20 C20 5, 35 35, 50 20 S80 5, 95 20" stroke="#FF4D6D" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg class="doodle doodle-arrow d2" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" data-parallax="0.15">
+        <path d="M10 50 C10 50, 30 10, 50 15" stroke="#FFEA00" stroke-width="3" stroke-linecap="round"/>
+        <path d="M42 8 L52 18 L36 18" stroke="#FFEA00" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+      </svg>
+      <svg class="doodle doodle-star d3" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" data-parallax="0.1">
+        <path d="M20 2 L23 14 L36 14 L26 22 L30 35 L20 27 L10 35 L14 22 L4 14 L17 14 Z" fill="#00F5D4" stroke="#00F5D4" stroke-width="1"/>
+      </svg>
+      <svg class="doodle doodle-spiral d4" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" data-parallax="0.07">
+        <path d="M30 30 C30 22, 38 22, 38 30 S30 42, 22 38 S18 22, 30 18 S44 22, 44 34 S30 50, 18 44" stroke="#7B2FBE" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+
+      <!-- Badge -->
+      <div class="hero-badge" id="rotating-badge">
+        <svg viewBox="0 0 120 120" class="badge-svg">
+          <path id="badge-text-path" d="M 60,60 m -37,0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"/>
+          <text class="badge-text">
+            <textPath href="#badge-text-path">✦ VIBE CODER ✦ AI ENTHUSIAST ✦ </textPath>
+          </text>
+        </svg>
+        <div class="badge-center">🤖</div>
+      </div>
+
+      <div class="hero-content">
+        <div class="hero-eyebrow reveal-up">
+          <span class="eyebrow-dot"></span>
+          BSc Computer Science · Madras Christian College '27
+        </div>
+
+        <h1 class="hero-headline reveal-up" id="hero-title">
+          <span class="hl-1">Joshuva P</span><br>
+          <span class="hl-2">Vibe Coder</span><br>
+          <span class="hl-3">&amp; AI <em>Enthusiast.</em></span>
+        </h1>
+
+        <div class="hero-sub reveal-up">
+          <p>Motivated developer leveraging artificial intelligence &amp; modern vibe coding techniques to build practical tools — from finance trackers to full-stack web apps, all built entirely in code.</p>
+        </div>
+
+        <div class="hero-ctas reveal-up">
+          <a href="#work" class="btn btn-primary" id="cta-work">
+            <span class="btn-text">View Projects</span>
+            <span class="btn-icon">↓</span>
+          </a>
+          <a href="https://github.com/jitsmep" target="_blank" rel="noopener" class="btn btn-ghost" id="cta-contact">
+            GitHub @jitsmep ✦
+          </a>
+        </div>
+
+        <div class="hero-scroll-hint reveal-up" id="scroll-hint">
+          <span>Scroll to explore my work</span>
+          <div class="scroll-mouse">
+            <div class="scroll-wheel"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Marquee strip -->
+      <div class="hero-marquee">
+        <div class="marquee-track">
+          <span>Vibe Coding</span><span class="m-dot">✦</span>
+          <span>Python</span><span class="m-dot">✦</span>
+          <span>AI Development</span><span class="m-dot">✦</span>
+          <span>Finance Knowledge</span><span class="m-dot">✦</span>
+          <span>Full-Stack Web</span><span class="m-dot">✦</span>
+          <span>Prompt Engineering</span><span class="m-dot">✦</span>
+          <span>Vibe Coding</span><span class="m-dot">✦</span>
+          <span>Python</span><span class="m-dot">✦</span>
+          <span>AI Development</span><span class="m-dot">✦</span>
+          <span>Finance Knowledge</span><span class="m-dot">✦</span>
+          <span>Full-Stack Web</span><span class="m-dot">✦</span>
+          <span>Prompt Engineering</span><span class="m-dot">✦</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ STATS ══════════════════════════════ -->
+    <section id="stats">
+      <div class="stats-grid">
+        <div class="stat-item reveal-up">
+          <div class="stat-num" data-target="3">0</div>
+          <div class="stat-label">Core Apps Built<br><small>(Trading, Finance, Portfolio)</small></div>
+        </div>
+        <div class="stat-item reveal-up" style="--delay:0.1s">
+          <div class="stat-num" data-target="2027">0</div>
+          <div class="stat-label">Graduation Year<br><small>Madras Christian College</small></div>
+        </div>
+        <div class="stat-item reveal-up" style="--delay:0.2s">
+          <div class="stat-num" data-target="100">0</div>
+          <div class="stat-label">AI-Assisted<br><small>Vibe Code Craft</small></div>
+          <div class="stat-unit">%</div>
+        </div>
+        <div class="stat-item reveal-up" style="--delay:0.3s">
+          <div class="stat-num" data-target="2">0</div>
+          <div class="stat-label">Core Domains<br><small>Finance + Software</small></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ WORK ══════════════════════════════ -->
+    <section id="work">
+      <div class="section-header">
+        <div class="section-tag reveal-left">Featured Projects</div>
+        <h2 class="section-title reveal-up">
+          Practical tools<br>
+          <span class="title-cursive">built entirely with code.</span>
+        </h2>
+        <svg class="title-squiggle" viewBox="0 0 200 20" fill="none">
+          <path d="M5 10 C40 2, 80 18, 120 10 S175 2, 195 10" stroke="#FF4D6D" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="work-grid">
+        <!-- Project 1: Trading Journal -->
+        <article class="case-card case-card--large reveal-up" id="cs1" data-cursor="view">
+          <div class="case-img-wrap">
+            <div class="case-img-placeholder ci-2">
+              <div class="ci-text">TRADING<br>JOURNAL</div>
+              <div class="ci-shapes">
+                <div class="ci-shape s1"></div>
+                <div class="ci-shape s2"></div>
+                <div class="ci-shape s3"></div>
+              </div>
+            </div>
+            <div class="case-overlay">
+              <span class="overlay-cta">View Project Details →</span>
+            </div>
+          </div>
+          <div class="case-info">
+            <div class="case-tags">
+              <span class="tag">Finance</span>
+              <span class="tag">Analytics</span>
+              <span class="tag">Personal Project</span>
+            </div>
+            <h3 class="case-title">Trading Journal — Record, organize &amp; review trades in one place</h3>
+            <div class="case-meta">
+              <div class="case-result">
+                <span class="result-num">P/L</span>
+                <span class="result-label">profit &amp; loss tracker</span>
+              </div>
+              <div class="case-result">
+                <span class="result-num">Analytics</span>
+                <span class="result-label">performance insights</span>
+              </div>
+            </div>
+            <p class="case-excerpt">Developed a comprehensive Trading Journal application to help traders record, organize, and review their trades with clear performance insights and profit/loss calculation.</p>
+            <a href="https://github.com/jitsmep" target="_blank" rel="noopener" class="case-link" id="cs1-link">View on GitHub <span class="link-arrow">→</span></a>
+          </div>
+          <div class="case-number">01</div>
+          <div class="case-sticker sticker-rotate-1">📈<br><small>Trading<br>App</small></div>
+        </article>
+
+        <!-- Project 2: Finance Tracker -->
+        <article class="case-card case-card--medium reveal-up" id="cs2" style="--delay:0.15s" data-cursor="view">
+          <div class="case-img-wrap">
+            <div class="case-img-placeholder ci-3">
+              <div class="ci-text">FINANCE<br>TRACKER</div>
+              <div class="ci-shapes">
+                <div class="ci-shape s1"></div>
+                <div class="ci-shape s2"></div>
+              </div>
+            </div>
+            <div class="case-overlay">
+              <span class="overlay-cta">View Project Details →</span>
+            </div>
+          </div>
+          <div class="case-info">
+            <div class="case-tags">
+              <span class="tag">Web App</span>
+              <span class="tag">Finance</span>
+            </div>
+            <h3 class="case-title">Finance Tracker — Smart income, expense &amp; budget management</h3>
+            <p class="case-excerpt">Helps users manage income, expenses, budget tracking, and automatic calculations of spending trends &amp; savings in real-time.</p>
+            <a href="https://github.com/jitsmep" target="_blank" rel="noopener" class="case-link" id="cs2-link">View on GitHub <span class="link-arrow">→</span></a>
+          </div>
+          <div class="case-number">02</div>
+        </article>
+
+        <!-- Project 3: Portfolio Builder -->
+        <article class="case-card case-card--small reveal-up" id="cs3" style="--delay:0.25s" data-cursor="view">
+          <div class="case-img-wrap">
+            <div class="case-img-placeholder ci-4">
+              <div class="ci-text">PORTFOLIO<br>BUILDER</div>
+              <div class="ci-shapes">
+                <div class="ci-shape s1"></div>
+                <div class="ci-shape s2"></div>
+              </div>
+            </div>
+            <div class="case-overlay">
+              <span class="overlay-cta">View Project Details →</span>
+            </div>
+          </div>
+          <div class="case-info">
+            <div class="case-tags">
+              <span class="tag">Full-Stack</span>
+              <span class="tag">Tooling</span>
+            </div>
+            <h3 class="case-title">Portfolio Builder — Create &amp; manage professional portfolios</h3>
+            <p class="case-excerpt">An easy-to-use application for updating skills, projects, education, and work experience with real-time live preview.</p>
+            <a href="https://github.com/jitsmep" target="_blank" rel="noopener" class="case-link" id="cs3-link">View on GitHub <span class="link-arrow">→</span></a>
+          </div>
+          <div class="case-number">03</div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ PROCESS / SKILLS ══════════════════════════════ -->
+    <section id="process">
+      <div class="process-bg-blob"></div>
+
+      <div class="section-header section-header--center">
+        <div class="section-tag reveal-left">Technical Toolkit &amp; Methodology</div>
+        <h2 class="section-title reveal-up">
+          How I build<br>
+          <span class="title-cursive">with AI &amp; Vibe Coding.</span>
+        </h2>
+      </div>
+
+      <div class="process-layout">
+        <div class="process-img-col reveal-left">
+          <div class="process-img-frame">
+            <img src="designer_avatar.png" alt="Joshuva P avatar" class="process-img" loading="lazy" />
+            <div class="process-img-caption">Joshuva P — Technology &amp; AI Enthusiast</div>
+          </div>
+          <!-- Floating sticky notes -->
+          <div class="sticky sticky-1 reveal-up" style="--delay:0.2s">
+            <span>Vibe Coding Expert 🚀</span>
+          </div>
+          <div class="sticky sticky-2 reveal-up" style="--delay:0.4s">
+            <span>Finance + Tech Blend 💡</span>
+          </div>
+          <div class="sticky sticky-3 reveal-up" style="--delay:0.6s">
+            <span>AI-Driven Workflow 🤖</span>
+          </div>
+        </div>
+
+        <div class="process-steps-col">
+          <div class="process-step reveal-right">
+            <div class="step-num">01</div>
+            <div class="step-content">
+              <h3 class="step-title">Vibe Coding &amp; AI Development</h3>
+              <p class="step-desc">Leveraging modern AI assistants, prompt engineering, and rapid iteration to build complete applications faster and cleaner.</p>
+            </div>
+          </div>
+
+          <div class="process-step reveal-right" style="--delay:0.1s">
+            <div class="step-num">02</div>
+            <div class="step-content">
+              <h3 class="step-title">Programming &amp; Tooling</h3>
+              <p class="step-desc">Proficient in Python, Microsoft Excel, VS Code, and Antigravity IDE environments for end-to-end development.</p>
+            </div>
+          </div>
+
+          <div class="process-step reveal-right" style="--delay:0.2s">
+            <div class="step-num">03</div>
+            <div class="step-content">
+              <h3 class="step-title">Financial Knowledge &amp; Domain Expertise</h3>
+              <p class="step-desc">Combining strong understanding of trading metrics, budget management, and financial logic with software development.</p>
+            </div>
+          </div>
+
+          <div class="process-step reveal-right" style="--delay:0.3s">
+            <div class="step-num">04</div>
+            <div class="step-content">
+              <h3 class="step-title">Active Learning Horizon</h3>
+              <p class="step-desc">Currently expanding capabilities into AI Full-stack Web Development, Bot Development, and custom API Integrations.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ ABOUT ══════════════════════════════ -->
+    <section id="about">
+      <div class="about-layout">
+        <div class="about-img-col reveal-left">
+          <div class="about-img-frame">
+            <img src="designer_avatar.png" alt="Joshuva P portrait" class="about-img" loading="lazy" />
+            <div class="avatar-doodle ad-1">✦</div>
+            <div class="avatar-doodle ad-2">★</div>
+          </div>
+        </div>
+
+        <div class="about-content-col">
+          <div class="section-tag reveal-up">About Joshuva P</div>
+          <h2 class="about-title reveal-up">
+            Self-driven learner, <br>
+            <span class="title-cursive">building real tools with AI.</span>
+          </h2>
+          <p class="about-bio reveal-up">I am a motivated Computer Science graduate student at <strong>Madras Christian College (Batch of 2027)</strong> with hands-on experience building applications using modern vibe coding techniques.</p>
+          <p class="about-bio reveal-up" style="--delay:0.1s">Passionate about leveraging artificial intelligence to create practical tools — from trading journals and finance trackers to full-stack web applications, all built entirely in code. Eager to contribute to innovative tech teams!</p>
+
+          <!-- Key Strengths -->
+          <div class="fun-facts reveal-up" style="--delay:0.2s">
+            <div class="ff-title">Key Strengths &amp; Highlights:</div>
+            <div class="ff-grid">
+              <div class="ff-item" id="ff1">
+                <span class="ff-emoji">📈</span>
+                <span>Financial Knowledge combined with web application development.</span>
+              </div>
+              <div class="ff-item" id="ff2">
+                <span class="ff-emoji">🤖</span>
+                <span>Self-driven learner with a portfolio of independently built projects.</span>
+              </div>
+              <div class="ff-item" id="ff3">
+                <span class="ff-emoji">🎓</span>
+                <span>BSc Computer Science @ Madras Christian College ('27).</span>
+              </div>
+              <div class="ff-item" id="ff4">
+                <span class="ff-emoji">💻</span>
+                <span>Vibe coding enthusiast turning prompts into production tools.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skills tags -->
+          <div class="skills-cloud reveal-up" style="--delay:0.3s">
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">Vibe Coding</span>
+            <span class="skill-tag">AI-Assisted Dev</span>
+            <span class="skill-tag">Prompt Engineering</span>
+            <span class="skill-tag">Full-Stack Web</span>
+            <span class="skill-tag">API Integration</span>
+            <span class="skill-tag">Bot Development</span>
+            <span class="skill-tag">VS Code</span>
+            <span class="skill-tag">Antigravity</span>
+            <span class="skill-tag">Microsoft Excel</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════ CONTACT ══════════════════════════════ -->
+    <section id="contact">
+      <div class="contact-inner">
+        <div class="contact-blob"></div>
+
+        <div class="section-tag reveal-up">Let's Connect</div>
+        <h2 class="contact-title reveal-up">
+          Interested in working<br>
+          <span class="title-cursive">or collaborating?</span>
+        </h2>
+
+        <p class="contact-sub reveal-up">I'm currently <span class="availability-badge">✦ Open to Opportunities</span>. Whether you have a project idea, a job opportunity, or just want to chat about AI &amp; tech — let's connect!</p>
+
+        <div class="contact-actions reveal-up">
+          <a href="mailto:pjoshuva31@gmail.com" class="btn btn-primary btn-xl" id="email-btn">
+            <span class="btn-text">Email Me: pjoshuva31@gmail.com ✦</span>
+          </a>
+          <div class="contact-or">or check out my code at</div>
+          <div class="social-links">
+            <a href="https://github.com/jitsmep" target="_blank" rel="noopener" class="social-link" id="sl-github">GitHub @jitsmep</a>
+            <a href="mailto:pjoshuva31@gmail.com" class="social-link" id="sl-email">Email</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ══════════════════════════════ FOOTER ══════════════════════════════ -->
+  <footer id="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">joshuva<span class="logo-dot">.p</span></div>
+      <div class="footer-copy">© 2026 Joshuva P — Built with Vibe Coding &amp; AI</div>
+      <div class="footer-links">
+        <a href="https://github.com/jitsmep" target="_blank" rel="noopener" class="footer-link">GitHub</a>
+        <a href="#hero" class="footer-link footer-top">Back to top ↑</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════ CHATBOT WIDGET ══════════════════════════════ -->
+  <button id="chatbot-toggle" aria-label="Open Chatbot" data-cursor="chat">
+    <svg id="chat-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+    </svg>
+    <svg id="chat-icon-close" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+
+  <div id="chatbot-panel" class="hidden">
+    <div class="chat-header">
+      <div class="chat-avatar">🤖</div>
+      <div class="chat-meta">
+        <div class="chat-title">Joshuva's AI Assistant</div>
+        <div class="chat-status"><span class="status-dot"></span> Online</div>
+      </div>
+      <button id="chat-close-btn" aria-label="Close Chat">&times;</button>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="chat-msg assistant">
+        Hi there! 👋 I'm Joshuva's portfolio assistant. Ask me anything about his skills, projects, or background!
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="chat-input" placeholder="Ask about projects, skills, contact..." autocomplete="off" />
+      <button id="chat-send-btn">Send</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

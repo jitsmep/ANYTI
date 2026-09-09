@@ -1,9 +1,5 @@
-import Image from "next/image";
-import Homepage from "./Homepage/page";
+import PortfolioRoot from "./3d/PortfolioRoot"
 
-export default function Home() {
-  return (
-    <><Homepage />
-    </>
-  );
+export default function RootPage() {
+  return <PortfolioRoot />
 }
