@@ -50,7 +50,12 @@ export default function PortfolioRoot() {
       <button
         id="portfolio-view-toggle"
         className="view-toggle-btn"
+        type="button"
         onClick={() => setIsClassic((v) => !v)}
+        onPointerDown={(e) => {
+          // Ensure immediate touch response without 300ms delay
+          e.stopPropagation()
+        }}
         aria-label={isClassic ? "Switch to 3D World" : "Switch to Classic View"}
         title={isClassic ? "Enter 3D World" : "Classic Portfolio View"}
       >

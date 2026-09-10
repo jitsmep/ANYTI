@@ -223,14 +223,20 @@ html, body {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   letter-spacing: 0.02em;
 }
 
-.view-toggle-btn:hover {
+.view-toggle-btn:hover,
+.view-toggle-btn:active {
   border-color: var(--c-violet-l);
   box-shadow: 0 0 20px rgba(124, 58, 237, 0.35);
-  background: rgba(124, 58, 237, 0.12);
+  background: rgba(124, 58, 237, 0.2);
 }
 
 .view-toggle-icon { font-size: 1rem; }

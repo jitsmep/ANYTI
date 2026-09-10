@@ -73,7 +73,7 @@ export default function Chatbot() {
         id="chatbot-toggle"
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? 'Close chat' : 'Open chat'}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-white shadow-lg hover:scale-110 hover:shadow-violet-500/40 transition-all duration-200"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-white shadow-lg hover:scale-110 hover:shadow-violet-500/40 transition-all duration-200"
       >
         {open ? (
           /* X icon */
