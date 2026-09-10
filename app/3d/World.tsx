@@ -2,8 +2,71 @@
 
 import React, { useRef } from "react"
 import { useFrame } from "@react-three/fiber"
+import { Text } from "@react-three/drei"
 import { RigidBody } from "@react-three/rapier"
 import * as THREE from "three"
+
+// ── Direction Sign ───────────────────────────────────────────────────────────
+function DirectionSign({
+  position,
+  rotation,
+  label,
+  color,
+  arrowDir,
+}: {
+  position: [number, number, number]
+  rotation?: [number, number, number]
+  label: string
+  color: string
+  arrowDir: "left" | "right" | "up"
+}) {
+  const arrowX = arrowDir === "left" ? -0.55 : arrowDir === "right" ? 0.55 : 0
+  const arrowY = arrowDir === "up" ? 0.38 : 0
+  const arrowRotZ =
+    arrowDir === "left" ? Math.PI / 2 : arrowDir === "right" ? -Math.PI / 2 : 0
+
+  return (
+    <group position={position} rotation={rotation ?? [0, 0, 0]}>
+      {/* Post */}
+      <mesh position={[0, 0.9, 0]}>
+        <cylinderGeometry args={[0.045, 0.06, 1.8, 6]} />
+        <meshStandardMaterial color="#475569" flatShading />
+      </mesh>
+
+      {/* Sign board */}
+      <mesh position={[0, 2.05, 0]}>
+        <boxGeometry args={[1.5, 0.5, 0.08]} />
+        <meshStandardMaterial color={color} flatShading />
+      </mesh>
+
+      {/* Sign board border highlight */}
+      <mesh position={[0, 2.05, 0.05]}>
+        <boxGeometry args={[1.52, 0.52, 0.01]} />
+        <meshStandardMaterial color="white" transparent opacity={0.12} />
+      </mesh>
+
+      {/* Label text */}
+      <Text
+        position={[arrowDir === "up" ? 0 : arrowDir === "left" ? 0.22 : -0.22, 2.06, 0.06]}
+        fontSize={0.18}
+        color="white"
+        anchorX="center"
+        anchorY="middle"
+        font={undefined}
+        outlineWidth={0.008}
+        outlineColor="#00000088"
+      >
+        {label}
+      </Text>
+
+      {/* Arrow indicator */}
+      <mesh position={[arrowX, arrowDir === "up" ? 2.3 : 2.05, 0.06]} rotation={[0, 0, arrowRotZ]}>
+        <coneGeometry args={[0.1, 0.22, 3]} />
+        <meshStandardMaterial color="white" emissive="white" emissiveIntensity={0.3} />
+      </mesh>
+    </group>
+  )
+}
 
 // ── Tree ────────────────────────────────────────────────────────────────────
 function Tree({ position }: { position: [number, number, number] }) {
@@ -189,6 +252,32 @@ export default function World() {
       <AmbientBuilding position={[-5, 0, -22]} width={3} depth={5} height={3} color="#374151" />
       <AmbientBuilding position={[6, 0, 20]} width={4} depth={3} height={3} color="#3f3f46" />
       <AmbientBuilding position={[-6, 0, 20]} width={3} depth={4} height={5} color="#52525b" />
+
+      {/* ── Direction Signs ─────────────────────────────────────────── */}
+      {/* Projects → East (right arrow). Roadside near east junction. */}
+      <DirectionSign
+        position={[3.5, 0, -2.5]}
+        rotation={[0, 0, 0]}
+        label="Projects"
+        color="#7c3aed"
+        arrowDir="right"
+      />
+      {/* About → West (left arrow). Roadside near west junction. */}
+      <DirectionSign
+        position={[-3.5, 0, 2.5]}
+        rotation={[0, Math.PI, 0]}
+        label="About"
+        color="#4f46e5"
+        arrowDir="right"
+      />
+      {/* Contact → North (up arrow). Roadside near north road. */}
+      <DirectionSign
+        position={[3.5, 0, 2.5]}
+        rotation={[0, -Math.PI / 2, 0]}
+        label="Contact"
+        color="#0d9488"
+        arrowDir="right"
+      />
     </group>
   )
 }
