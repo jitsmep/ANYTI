@@ -101,6 +101,10 @@ export default function Scene({ touchKeys }: SceneProps) {
           camera={{ fov: 50, near: 0.1, far: 300 }}
           gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
           className="scene-canvas"
+          // Scope R3F pointer events to the canvas element only,
+          // preventing it from swallowing touch events from DOM overlays (D-pad buttons)
+          eventSource={typeof document !== "undefined" ? document.body : undefined}
+          eventPrefix="client"
         >
           {/* Lighting */}
           <ambientLight intensity={0.6} color="#e0e7ff" />

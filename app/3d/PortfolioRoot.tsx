@@ -40,10 +40,16 @@ export default function PortfolioRoot() {
       {isClassic ? (
         <ClassicView />
       ) : (
-        <div className="portfolio-root-3d">
-          <Scene touchKeys={touchKeys} />
-          {isTouchDevice && <TouchControls onKeysChange={setTouchKeys} />}
-        </div>
+        <>
+          <div className="portfolio-root-3d">
+            <Scene touchKeys={touchKeys} />
+          </div>
+          {/* TouchControls rendered OUTSIDE the canvas div so R3F Canvas
+              cannot intercept touch events meant for the D-pad buttons */}
+          {isTouchDevice && !isClassic && (
+            <TouchControls onKeysChange={setTouchKeys} />
+          )}
+        </>
       )}
 
       {/* Persistent toggle button */}
