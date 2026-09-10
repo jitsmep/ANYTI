@@ -12,8 +12,10 @@ interface TouchControlsProps {
   }) => void
 }
 
+type KeyType = "forward" | "backward" | "left" | "right" | "action"
+
 export default function TouchControls({ onKeysChange }: TouchControlsProps) {
-  const keys = React.useRef({
+  const activeKeys = React.useRef<Record<KeyType, boolean>>({
     forward: false,
     backward: false,
     left: false,
@@ -21,17 +23,53 @@ export default function TouchControls({ onKeysChange }: TouchControlsProps) {
     action: false,
   })
 
-  function press(key: keyof typeof keys.current, active: boolean) {
-    keys.current[key] = active
-    onKeysChange({ ...keys.current })
+  // Track active pointer IDs per key for robust multi-touch support
+  const keyPointers = React.useRef<Record<KeyType, number | null>>({
+    forward: null,
+    backward: null,
+    left: null,
+    right: null,
+    action: null,
+  })
+
+  function updateKey(key: KeyType, active: boolean) {
+    if (activeKeys.current[key] !== active) {
+      activeKeys.current[key] = active
+      onKeysChange({ ...activeKeys.current })
+    }
   }
 
-  function makeButtonProps(key: keyof typeof keys.current) {
+  function handlePointerDown(key: KeyType, e: React.PointerEvent<HTMLButtonElement>) {
+    e.preventDefault()
+    e.stopPropagation()
+    keyPointers.current[key] = e.pointerId
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId)
+    } catch {
+      // Ignore fallback if browser restricts pointer capture
+    }
+    updateKey(key, true)
+  }
+
+  function handlePointerUp(key: KeyType, e: React.PointerEvent<HTMLButtonElement>) {
+    e.preventDefault()
+    if (keyPointers.current[key] === e.pointerId || keyPointers.current[key] === null) {
+      keyPointers.current[key] = null
+      updateKey(key, false)
+    }
+  }
+
+  function handlePointerCancel(key: KeyType, e: React.PointerEvent<HTMLButtonElement>) {
+    keyPointers.current[key] = null
+    updateKey(key, false)
+  }
+
+  function makeButtonProps(key: KeyType) {
     return {
-      onPointerDown: () => press(key, true),
-      onPointerUp: () => press(key, false),
-      onPointerLeave: () => press(key, false),
-      onPointerCancel: () => press(key, false),
+      onPointerDown: (e: React.PointerEvent<HTMLButtonElement>) => handlePointerDown(key, e),
+      onPointerUp: (e: React.PointerEvent<HTMLButtonElement>) => handlePointerUp(key, e),
+      onPointerCancel: (e: React.PointerEvent<HTMLButtonElement>) => handlePointerCancel(key, e),
+      onContextMenu: (e: React.MouseEvent) => e.preventDefault(),
     }
   }
 

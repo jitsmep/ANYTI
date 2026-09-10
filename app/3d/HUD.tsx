@@ -27,7 +27,7 @@ export default function HUD({ nearStation, vehiclePos, onEnter }: HUDProps) {
           <div className="hud-prompt-text">
             <p className="hud-prompt-title">{station.label}</p>
             <p className="hud-prompt-hint">
-              Press <kbd>Enter</kbd> to open
+              Tap here or press <kbd>Enter</kbd> to open
             </p>
           </div>
         </div>

@@ -19,15 +19,20 @@ export default function PortfolioRoot() {
     action: false,
   })
 
-  // Detect touch-only devices on mount
+  // Detect touch capability or small screen size on mount & resize
   useEffect(() => {
-    const touch =
-      typeof navigator !== "undefined" &&
-      (navigator.maxTouchPoints > 0 || "ontouchstart" in window)
-    setIsTouchDevice(touch)
-    // Touch devices auto-switch to classic for best experience
-    // (They can still opt into 3D via the toggle)
-    // We'll NOT auto-switch — we'll show touch controls instead
+    function checkTouch() {
+      const isCoarse = typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches
+      const isSmallScreen = typeof window !== "undefined" && window.innerWidth <= 768
+      const hasTouch =
+        typeof navigator !== "undefined" &&
+        (navigator.maxTouchPoints > 0 || "ontouchstart" in window)
+      setIsTouchDevice(isCoarse || isSmallScreen || hasTouch)
+    }
+
+    checkTouch()
+    window.addEventListener("resize", checkTouch)
+    return () => window.removeEventListener("resize", checkTouch)
   }, [])
 
   return (
