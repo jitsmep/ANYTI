@@ -610,31 +610,36 @@ html, body {
 
 @media (max-width: 768px) {
   .touch-controls {
-    bottom: 16px;
+    bottom: max(54px, calc(42px + env(safe-area-inset-bottom, 0px)));
     gap: 16px;
     width: 100%;
-    max-width: 420px;
+    max-width: 440px;
     justify-content: space-between;
     padding: 0 20px;
   }
   .dpad {
-    grid-template-columns: 44px 44px 44px;
-    grid-template-rows: 44px 44px 44px;
+    grid-template-columns: 48px 48px 48px;
+    grid-template-rows: 48px 48px 48px;
+    gap: 4px;
+  }
+  .dpad-btn {
+    font-size: 18px;
   }
   .touch-action-btn {
-    padding: 16px 22px;
-    font-size: 13px;
+    padding: 16px 26px;
+    font-size: 14px;
+    font-weight: 800;
   }
   .hud-prompt {
-    bottom: 175px;
+    bottom: max(240px, calc(220px + env(safe-area-inset-bottom, 0px)));
     width: calc(100% - 32px);
     min-width: unset;
     max-width: 360px;
     padding: 12px 18px;
   }
   .hud-minimap {
-    top: 12px;
-    left: 12px;
+    top: 14px;
+    left: 14px;
     width: 86px;
     height: 86px;
   }
@@ -642,10 +647,10 @@ html, body {
     height: 74px;
   }
   .view-toggle-btn {
-    top: 12px;
-    right: 12px;
-    padding: 8px 14px;
-    font-size: 12px;
+    top: 14px;
+    right: 14px;
+    padding: 9px 15px;
+    font-size: 12.5px;
   }
   .hud-controls {
     display: none;

@@ -32,9 +32,6 @@ export default function TouchControls({ onKeysChange }: TouchControlsProps) {
 
   function makeButtonProps(key: KeyType) {
     const start = (e: React.SyntheticEvent) => {
-      if (e.cancelable) {
-        e.preventDefault()
-      }
       e.stopPropagation()
       updateKey(key, true)
     }
@@ -45,6 +42,9 @@ export default function TouchControls({ onKeysChange }: TouchControlsProps) {
     }
 
     return {
+      onPointerDown: start,
+      onPointerUp: stop,
+      onPointerCancel: stop,
       onTouchStart: start,
       onTouchEnd: stop,
       onTouchCancel: stop,
