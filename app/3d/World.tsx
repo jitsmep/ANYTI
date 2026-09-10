@@ -270,13 +270,13 @@ export default function World() {
         color="#4f46e5"
         arrowDir="right"
       />
-      {/* Contact → North (up arrow). Roadside near north road. */}
+      {/* Contact → North (points North along road). Roadside near junction. */}
       <DirectionSign
         position={[3.5, 0, 2.5]}
         rotation={[0, -Math.PI / 2, 0]}
         label="Contact"
         color="#0d9488"
-        arrowDir="right"
+        arrowDir="left"
       />
     </group>
   )

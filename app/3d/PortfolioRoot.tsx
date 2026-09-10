@@ -35,6 +35,27 @@ export default function PortfolioRoot() {
     return () => window.removeEventListener("resize", checkTouch)
   }, [])
 
+  // Lock document scroll and overscroll-behavior while in 3D mode to prevent scroll borders and flicker
+  useEffect(() => {
+    if (!isClassic) {
+      document.documentElement.style.overflow = "hidden"
+      document.body.style.overflow = "hidden"
+      document.documentElement.style.overscrollBehavior = "none"
+      document.body.style.overscrollBehavior = "none"
+    } else {
+      document.documentElement.style.overflow = ""
+      document.body.style.overflow = ""
+      document.documentElement.style.overscrollBehavior = ""
+      document.body.style.overscrollBehavior = ""
+    }
+    return () => {
+      document.documentElement.style.overflow = ""
+      document.body.style.overflow = ""
+      document.documentElement.style.overscrollBehavior = ""
+      document.body.style.overscrollBehavior = ""
+    }
+  }, [isClassic])
+
   return (
     <>
       {isClassic ? (

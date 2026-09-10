@@ -30,26 +30,48 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
+  width: 100%;
   height: 100%;
+  margin: 0;
+  padding: 0;
   background: var(--c-bg);
   color: var(--c-text);
   font-family: var(--font);
   -webkit-font-smoothing: antialiased;
-  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  /* Hide scrollbars completely across browsers in both vertical and landscape */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* ── 3D Root ────────────────────────────────────────────────────────────── */
 .portfolio-root-3d {
-  position: relative;
-  width: 100vw;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   height: 100dvh;
   overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .scene-root {
   position: relative;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  touch-action: none;
 }
 
 .scene-canvas {
@@ -58,6 +80,15 @@ html, body {
   height: 100% !important;
   /* Allow DOM overlays (D-pad buttons etc.) positioned on top to receive their own touch events */
   touch-action: none;
+  outline: none !important;
+  border: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.scene-canvas:focus,
+.scene-canvas:focus-visible {
+  outline: none !important;
+  border: none !important;
 }
 
 /* ── Loading screen ─────────────────────────────────────────────────────── */
@@ -574,12 +605,18 @@ html, body {
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
   transition: background 0.1s, transform 0.08s;
 }
 
 .dpad-btn:active,
 .dpad-btn:focus,
-.touch-action-btn:active {
+.dpad-btn:focus-visible,
+.touch-action-btn:active,
+.touch-action-btn:focus,
+.touch-action-btn:focus-visible {
+  outline: none !important;
   background: rgba(124, 58, 237, 0.45) !important;
   border-color: var(--c-violet-l);
   transform: scale(0.94);
@@ -606,6 +643,8 @@ html, body {
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
   box-shadow: 0 4px 18px rgba(124, 58, 237, 0.35);
   transition: transform 0.08s, background 0.1s;
 }
@@ -653,6 +692,56 @@ html, body {
     right: 14px;
     padding: 9px 15px;
     font-size: 12.5px;
+  }
+  .hud-controls {
+    display: none;
+  }
+}
+
+/* Landscape orientation on mobile devices to prevent any scrollbars, borders, or layout collisions */
+@media (max-height: 520px) {
+  .touch-controls {
+    bottom: max(10px, env(safe-area-inset-bottom, 0px));
+    width: 100%;
+    max-width: 100%;
+    padding: 0 max(24px, env(safe-area-inset-right, 0px)) 0 max(24px, env(safe-area-inset-left, 0px));
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .dpad {
+    grid-template-columns: 38px 38px 38px;
+    grid-template-rows: 38px 38px 38px;
+    gap: 3px;
+  }
+  .dpad-btn {
+    font-size: 15px;
+  }
+  .touch-action-btn {
+    padding: 11px 20px;
+    font-size: 12.5px;
+  }
+  .hud-prompt {
+    bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    width: auto;
+    min-width: 240px;
+    max-width: 320px;
+    padding: 8px 14px;
+    font-size: 12.5px;
+  }
+  .hud-minimap {
+    top: 10px;
+    left: 10px;
+    width: 68px;
+    height: 68px;
+  }
+  .hud-minimap-inner {
+    height: 56px;
+  }
+  .view-toggle-btn {
+    top: 10px;
+    right: 10px;
+    padding: 6px 12px;
+    font-size: 11.5px;
   }
   .hud-controls {
     display: none;
