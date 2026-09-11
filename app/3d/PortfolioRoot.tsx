@@ -1,29 +1,40 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import dynamic from "next/dynamic"
 import ClassicView from "./ClassicView"
-import TouchControls from "./TouchControls"
+import FlightTouchControls from "./FlightTouchControls"
+import type { VehicleMode } from "./VehicleController"
 
-// Dynamically import Scene to avoid SSR issues with WebGL + WASM
+import type { StationId } from "./data/stations"
+
+// Dynamically import Scene to avoid SSR issues with WebGL + Canvas
 const Scene = dynamic(() => import("./Scene"), { ssr: false })
 
 export default function PortfolioRoot() {
   const [isClassic, setIsClassic] = useState(false)
   const [isTouchDevice, setIsTouchDevice] = useState(false)
-  const [touchKeys, setTouchKeys] = useState({
-    forward: false,
-    backward: false,
-    left: false,
-    right: false,
-    action: false,
-  })
+  const [targetSection, setTargetSection] = useState<StationId | null>(null)
+
+  // Touch vehicle driving navigation state
+  const [touchOffset, setTouchOffset] = useState({ x: 0, y: 0 })
+  const [vehicleMode, setVehicleMode] = useState<VehicleMode>("CRUISING")
+  const [canEnter, setCanEnter] = useState(false)
+  const [stationLabel, setStationLabel] = useState<string | undefined>(undefined)
+
+  // Refs for triggering actions from touch controls into Scene
+  const enterStationTriggerRef = useRef<(() => void) | null>(null)
+  const exitStationTriggerRef = useRef<(() => void) | null>(null)
+  const skipNextRef = useRef<(() => void) | null>(null)
+  const skipPrevRef = useRef<(() => void) | null>(null)
 
   // Detect touch capability or small screen size on mount & resize
   useEffect(() => {
     function checkTouch() {
-      const isCoarse = typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches
-      const isSmallScreen = typeof window !== "undefined" && window.innerWidth <= 768
+      const isCoarse =
+        typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches
+      const isSmallScreen =
+        typeof window !== "undefined" && window.innerWidth <= 768
       const hasTouch =
         typeof navigator !== "undefined" &&
         (navigator.maxTouchPoints > 0 || "ontouchstart" in window)
@@ -35,7 +46,7 @@ export default function PortfolioRoot() {
     return () => window.removeEventListener("resize", checkTouch)
   }, [])
 
-  // Lock document scroll and overscroll-behavior while in 3D mode to prevent scroll borders and flicker
+  // Lock document scroll and overscroll-behavior while in 3D mode
   useEffect(() => {
     if (!isClassic) {
       document.documentElement.style.overflow = "hidden"
@@ -56,40 +67,73 @@ export default function PortfolioRoot() {
     }
   }, [isClassic])
 
+  const handleFlightStateChange = React.useCallback(
+    (mode: VehicleMode, enterable: boolean, label?: string) => {
+      setVehicleMode(mode)
+      setCanEnter(enterable)
+      setStationLabel(label)
+    },
+    []
+  )
+
+  const handleEnterWorld = React.useCallback((sectionId?: StationId) => {
+    setTargetSection(sectionId ?? null)
+    setIsClassic(false)
+  }, [])
+
   return (
     <>
       {isClassic ? (
-        <ClassicView />
+        <ClassicView onEnterWorld={handleEnterWorld} />
       ) : (
         <>
           <div className="portfolio-root-3d">
-            <Scene touchKeys={touchKeys} />
+            <Scene
+              touchOffset={isTouchDevice ? touchOffset : undefined}
+              targetStationId={targetSection}
+              onFlightStateChange={handleFlightStateChange}
+              onTriggerLandRef={enterStationTriggerRef}
+              onTriggerTakeoffRef={exitStationTriggerRef}
+              onSkipNextRef={skipNextRef}
+              onSkipPrevRef={skipPrevRef}
+            />
           </div>
-          {/* TouchControls rendered OUTSIDE the canvas div so R3F Canvas
-              cannot intercept touch events meant for the D-pad buttons */}
+
+          {/* Touch navigation controls rendered outside canvas */}
           {isTouchDevice && !isClassic && (
-            <TouchControls onKeysChange={setTouchKeys} />
+            <FlightTouchControls
+              flightMode={vehicleMode}
+              canLand={canEnter}
+              stationLabel={stationLabel}
+              onOffsetChange={setTouchOffset}
+              onLandPress={() => enterStationTriggerRef.current?.()}
+              onTakeoffPress={() => exitStationTriggerRef.current?.()}
+              onNextStation={() => skipNextRef.current?.()}
+              onPrevStation={() => skipPrevRef.current?.()}
+            />
           )}
         </>
       )}
 
-      {/* Persistent toggle button */}
+      {/* Persistent view toggle button */}
       <button
         id="portfolio-view-toggle"
         className="view-toggle-btn"
         type="button"
-        onClick={() => setIsClassic((v) => !v)}
+        onClick={() => {
+          setTargetSection(null)
+          setIsClassic((v) => !v)
+        }}
         onPointerDown={(e) => {
-          // Ensure immediate touch response without 300ms delay
           e.stopPropagation()
         }}
-        aria-label={isClassic ? "Switch to 3D World" : "Switch to Classic View"}
-        title={isClassic ? "Enter 3D World" : "Classic Portfolio View"}
+        aria-label={isClassic ? "Enter Joshuva's World" : "Switch to Classic View"}
+        title={isClassic ? "Enter Joshuva's World" : "Classic Portfolio View"}
       >
         {isClassic ? (
           <>
-            <span className="view-toggle-icon">🎮</span>
-            <span>3D World</span>
+            <span className="view-toggle-icon">🏎️</span>
+            <span>Joshuva&apos;s World</span>
           </>
         ) : (
           <>

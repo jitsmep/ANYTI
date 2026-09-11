@@ -3,8 +3,12 @@
 import React from "react"
 import { BIO, PROJECTS, SKILLS } from "./data/portfolio"
 
+interface ClassicViewProps {
+  onEnterWorld?: (sectionId?: "projects" | "about" | "contact") => void
+}
+
 // ── Nav ─────────────────────────────────────────────────────────────────────
-function ClassicNav() {
+function ClassicNav({ onEnterWorld }: ClassicViewProps) {
   return (
     <nav className="classic-nav">
       <div className="classic-nav-inner">
@@ -12,6 +16,13 @@ function ClassicNav() {
           <span className="classic-nav-logo-accent">J</span>oshuva P
         </span>
         <div className="classic-nav-links">
+          <button
+            type="button"
+            className="classic-nav-world-btn"
+            onClick={() => onEnterWorld?.()}
+          >
+            ✦ Joshuva&apos;s World ✈️
+          </button>
           <a href="#classic-projects">Projects</a>
           <a href="#classic-about">About</a>
           <a href="#classic-contact">Contact</a>
@@ -22,7 +33,7 @@ function ClassicNav() {
 }
 
 // ── Hero ─────────────────────────────────────────────────────────────────────
-function ClassicHero() {
+function ClassicHero({ onEnterWorld }: ClassicViewProps) {
   return (
     <section className="classic-hero">
       <div className="classic-blobs">
@@ -41,6 +52,13 @@ function ClassicHero() {
         <p className="classic-hero-tagline">{BIO.title}</p>
         <p className="classic-hero-sub">{BIO.tagline}</p>
         <div className="classic-hero-cta">
+          <button
+            type="button"
+            className="classic-btn-world-hero"
+            onClick={() => onEnterWorld?.()}
+          >
+            ✈️ Enter Joshuva&apos;s World
+          </button>
           <a href="#classic-projects" className="classic-btn-primary">View Projects</a>
           <a href="#classic-contact" className="classic-btn-secondary">Get in Touch</a>
         </div>
@@ -264,11 +282,11 @@ function ClassicContact() {
 }
 
 // ── Root ─────────────────────────────────────────────────────────────────────
-export default function ClassicView() {
+export default function ClassicView({ onEnterWorld }: ClassicViewProps) {
   return (
     <div className="classic-root">
-      <ClassicNav />
-      <ClassicHero />
+      <ClassicNav onEnterWorld={onEnterWorld} />
+      <ClassicHero onEnterWorld={onEnterWorld} />
       <ClassicAbout />
       <ClassicSkills />
       <ClassicProjects />

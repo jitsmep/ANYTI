@@ -3,66 +3,211 @@
 import React, { useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import { Text } from "@react-three/drei"
-import { RigidBody } from "@react-three/rapier"
 import * as THREE from "three"
 
-// ── Direction Sign ───────────────────────────────────────────────────────────
-function DirectionSign({
-  position,
-  rotation,
-  label,
-  color,
-  arrowDir,
-}: {
-  position: [number, number, number]
-  rotation?: [number, number, number]
-  label: string
-  color: string
-  arrowDir: "left" | "right" | "up"
-}) {
-  const arrowX = arrowDir === "left" ? -0.55 : arrowDir === "right" ? 0.55 : 0
-  const arrowY = arrowDir === "up" ? 0.38 : 0
-  const arrowRotZ =
-    arrowDir === "left" ? Math.PI / 2 : arrowDir === "right" ? -Math.PI / 2 : 0
+import { FLIGHT_CURVE } from "./data/flightPath"
+
+// ── Continuous Cyber Highway Ribbon Loop ──────────────────────────────────────
+function CyberHighway() {
+  const { roadGeom, curbLeftGeom, curbRightGeom, centerDashes } = React.useMemo(() => {
+    const SAMPLES = 180
+    const width = 4.4
+    const hw = width / 2
+    const positions: number[] = []
+    const uvs: number[] = []
+    const indices: number[] = []
+
+    const curbLeftPos: number[] = []
+    const curbRightPos: number[] = []
+    const curbIndices: number[] = []
+
+    const dashes: { pos: [number, number, number]; rotY: number }[] = []
+    const UP = new THREE.Vector3(0, 1, 0)
+
+    for (let i = 0; i <= SAMPLES; i++) {
+      const t = (i % SAMPLES) / SAMPLES
+      const pt = FLIGHT_CURVE.getPointAt(t)
+      const tang = FLIGHT_CURVE.getTangentAt(t).normalize()
+      const binorm = new THREE.Vector3().crossVectors(tang, UP).normalize()
+
+      const left = pt.clone().addScaledVector(binorm, -hw)
+      const right = pt.clone().addScaledVector(binorm, hw)
+
+      positions.push(left.x, 0.015, left.z)
+      positions.push(right.x, 0.015, right.z)
+
+      const v = (i / SAMPLES) * 32
+      uvs.push(0, v, 1, v)
+
+      if (i < SAMPLES) {
+        const idx = i * 2
+        indices.push(idx, idx + 1, idx + 2)
+        indices.push(idx + 1, idx + 3, idx + 2)
+      }
+
+      // Neon curb rails (0.12 wide strip on each side)
+      const cL1 = pt.clone().addScaledVector(binorm, -hw)
+      const cL2 = pt.clone().addScaledVector(binorm, -hw - 0.12)
+      curbLeftPos.push(cL1.x, 0.025, cL1.z)
+      curbLeftPos.push(cL2.x, 0.025, cL2.z)
+
+      const cR1 = pt.clone().addScaledVector(binorm, hw)
+      const cR2 = pt.clone().addScaledVector(binorm, hw + 0.12)
+      curbRightPos.push(cR1.x, 0.025, cR1.z)
+      curbRightPos.push(cR2.x, 0.025, cR2.z)
+
+      if (i < SAMPLES) {
+        const cIdx = i * 2
+        curbIndices.push(cIdx, cIdx + 1, cIdx + 2)
+        curbIndices.push(cIdx + 1, cIdx + 3, cIdx + 2)
+      }
+
+      // Dashed center lane markings every ~3 samples
+      if (i % 3 === 0 && i < SAMPLES) {
+        const heading = Math.atan2(tang.x, tang.z)
+        dashes.push({
+          pos: [pt.x, 0.02, pt.z],
+          rotY: heading,
+        })
+      }
+    }
+
+    const rG = new THREE.BufferGeometry()
+    rG.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3))
+    rG.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2))
+    rG.setIndex(indices)
+    rG.computeVertexNormals()
+
+    const cLG = new THREE.BufferGeometry()
+    cLG.setAttribute("position", new THREE.Float32BufferAttribute(curbLeftPos, 3))
+    cLG.setIndex(curbIndices)
+    cLG.computeVertexNormals()
+
+    const cRG = new THREE.BufferGeometry()
+    cRG.setAttribute("position", new THREE.Float32BufferAttribute(curbRightPos, 3))
+    cRG.setIndex(curbIndices)
+    cRG.computeVertexNormals()
+
+    return { roadGeom: rG, curbLeftGeom: cLG, curbRightGeom: cRG, centerDashes: dashes }
+  }, [])
 
   return (
-    <group position={position} rotation={rotation ?? [0, 0, 0]}>
-      {/* Post */}
-      <mesh position={[0, 0.9, 0]}>
-        <cylinderGeometry args={[0.045, 0.06, 1.8, 6]} />
-        <meshStandardMaterial color="#475569" flatShading />
+    <group>
+      {/* Asphalt highway surface */}
+      <mesh geometry={roadGeom} receiveShadow>
+        <meshStandardMaterial color="#0b1120" roughness={0.7} metalness={0.15} />
       </mesh>
 
-      {/* Sign board */}
-      <mesh position={[0, 2.05, 0]}>
-        <boxGeometry args={[1.5, 0.5, 0.08]} />
-        <meshStandardMaterial color={color} flatShading />
+      {/* Left glowing curb (Violet) */}
+      <mesh geometry={curbLeftGeom}>
+        <meshStandardMaterial color="#7c3aed" emissive="#7c3aed" emissiveIntensity={2.5} roughness={0.3} />
       </mesh>
 
-      {/* Sign board border highlight */}
-      <mesh position={[0, 2.05, 0.05]}>
-        <boxGeometry args={[1.52, 0.52, 0.01]} />
-        <meshStandardMaterial color="white" transparent opacity={0.12} />
+      {/* Right glowing curb (Sky Blue) */}
+      <mesh geometry={curbRightGeom}>
+        <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={2.5} roughness={0.3} />
       </mesh>
 
-      {/* Label text */}
-      <Text
-        position={[arrowDir === "up" ? 0 : arrowDir === "left" ? 0.22 : -0.22, 2.06, 0.06]}
-        fontSize={0.18}
-        color="white"
-        anchorX="center"
-        anchorY="middle"
-        font={undefined}
-        outlineWidth={0.008}
-        outlineColor="#00000088"
-      >
-        {label}
-      </Text>
+      {/* Center dashed lane divider */}
+      {centerDashes.map((d, i) => (
+        <mesh key={i} position={d.pos} rotation={[0, d.rotY, 0]}>
+          <boxGeometry args={[0.22, 0.015, 1.4]} />
+          <meshStandardMaterial color="#f8fafc" emissive="#e2e8f0" emissiveIntensity={0.6} roughness={0.4} />
+        </mesh>
+      ))}
 
-      {/* Arrow indicator */}
-      <mesh position={[arrowX, arrowDir === "up" ? 2.3 : 2.05, 0.06]} rotation={[0, 0, arrowRotZ]}>
-        <coneGeometry args={[0.1, 0.22, 3]} />
-        <meshStandardMaterial color="white" emissive="white" emissiveIntensity={0.3} />
+      {/* Grand Entrance Plaza under Arch [0, 0, 18] */}
+      <mesh receiveShadow position={[0, 0.018, 18]}>
+        <boxGeometry args={[11.5, 0.02, 6.0]} />
+        <meshStandardMaterial color="#070d19" roughness={0.6} metalness={0.3} />
+      </mesh>
+      {/* Entrance grid neon accent lines */}
+      {[-3, -1, 1, 3].map((x, i) => (
+        <mesh key={i} position={[x, 0.024, 18]}>
+          <boxGeometry args={[0.06, 0.01, 5.8]} />
+          <meshStandardMaterial color="#7c3aed" emissive="#7c3aed" emissiveIntensity={1.8} />
+        </mesh>
+      ))}
+
+      {/* Station Parking Plazas connecting road to entrances */}
+      {/* Projects Parking Plaza */}
+      <mesh receiveShadow position={[14, 0.016, 5.0]}>
+        <boxGeometry args={[6.5, 0.02, 4.0]} />
+        <meshStandardMaterial color="#0f172a" roughness={0.7} metalness={0.2} />
+      </mesh>
+
+      {/* Contact Parking Plaza */}
+      <mesh receiveShadow position={[2, 0.016, -12.5]}>
+        <boxGeometry args={[6.0, 0.02, 4.0]} />
+        <meshStandardMaterial color="#0f172a" roughness={0.7} metalness={0.2} />
+      </mesh>
+
+      {/* About Parking Plaza */}
+      <mesh receiveShadow position={[-14, 0.016, -0.5]}>
+        <boxGeometry args={[6.5, 0.02, 4.0]} />
+        <meshStandardMaterial color="#0f172a" roughness={0.7} metalness={0.2} />
+      </mesh>
+    </group>
+  )
+}
+
+// ── Floating Low-Poly Stylized Clouds ─────────────────────────────────────────
+function LowPolyCloud({
+  position,
+  scale = 1,
+  speed = 0.5,
+}: {
+  position: [number, number, number]
+  scale?: number
+  speed?: number
+}) {
+  const groupRef = useRef<THREE.Group>(null)
+  const initialX = position[0]
+
+  useFrame((_, delta) => {
+    if (groupRef.current) {
+      // Gentle wind drift
+      groupRef.current.position.x += delta * speed
+      if (groupRef.current.position.x > 40) {
+        groupRef.current.position.x = -40
+      }
+    }
+  })
+
+  return (
+    <group ref={groupRef} position={position} scale={[scale, scale * 0.6, scale]}>
+      <mesh castShadow receiveShadow>
+        <dodecahedronGeometry args={[2.2, 1]} />
+        <meshStandardMaterial
+          color="#f1f5f9"
+          roughness={0.9}
+          flatShading
+          transparent
+          opacity={0.85}
+          depthWrite={false}
+        />
+      </mesh>
+      <mesh position={[1.8, -0.2, 0.4]}>
+        <dodecahedronGeometry args={[1.5, 1]} />
+        <meshStandardMaterial
+          color="#f8fafc"
+          roughness={0.9}
+          flatShading
+          transparent
+          opacity={0.85}
+          depthWrite={false}
+        />
+      </mesh>
+      <mesh position={[-1.6, -0.1, -0.3]}>
+        <dodecahedronGeometry args={[1.6, 1]} />
+        <meshStandardMaterial
+          color="#f8fafc"
+          roughness={0.9}
+          flatShading
+          transparent
+          opacity={0.85}
+          depthWrite={false}
+        />
       </mesh>
     </group>
   )
@@ -88,26 +233,6 @@ function Tree({ position }: { position: [number, number, number] }) {
   )
 }
 
-// ── Lamp Post ───────────────────────────────────────────────────────────────
-function LampPost({ position }: { position: [number, number, number] }) {
-  return (
-    <group position={position}>
-      <mesh castShadow position={[0, 2, 0]}>
-        <cylinderGeometry args={[0.05, 0.08, 4, 6]} />
-        <meshStandardMaterial color="#475569" flatShading />
-      </mesh>
-      <mesh position={[0.3, 3.9, 0]}>
-        <boxGeometry args={[0.6, 0.08, 0.08]} />
-        <meshStandardMaterial color="#475569" flatShading />
-      </mesh>
-      <mesh position={[0.6, 3.8, 0]}>
-        <boxGeometry args={[0.14, 0.22, 0.14]} />
-        <meshStandardMaterial color="#fef9c3" emissive="#fef9c3" emissiveIntensity={1.2} />
-      </mesh>
-    </group>
-  )
-}
-
 // ── Small ambient building ───────────────────────────────────────────────────
 function AmbientBuilding({
   position,
@@ -128,7 +253,6 @@ function AmbientBuilding({
         <boxGeometry args={[width, height, depth]} />
         <meshStandardMaterial color={color} flatShading />
       </mesh>
-      {/* Roof */}
       <mesh castShadow position={[0, height + 0.15, 0]}>
         <boxGeometry args={[width + 0.1, 0.3, depth + 0.1]} />
         <meshStandardMaterial color="#1e293b" flatShading />
@@ -137,83 +261,147 @@ function AmbientBuilding({
   )
 }
 
-// ── Road segment ─────────────────────────────────────────────────────────────
-function RoadSegment({
-  position,
-  width,
-  depth,
-}: {
-  position: [number, number, number]
-  width: number
-  depth: number
-}) {
+function JoshuvasWorldArch({ position = [0, 0, 18] }: { position?: [number, number, number] }) {
   return (
-    <mesh receiveShadow position={position}>
-      <boxGeometry args={[width, 0.08, depth]} />
-      <meshStandardMaterial color="#374151" flatShading />
-    </mesh>
+    <group position={position}>
+      {/* Left Tower Pillar */}
+      <mesh castShadow position={[-5.5, 6, 0]}>
+        <boxGeometry args={[0.9, 12, 0.9]} />
+        <meshStandardMaterial color="#1e1b4b" flatShading roughness={0.3} />
+      </mesh>
+      {/* Right Tower Pillar */}
+      <mesh castShadow position={[5.5, 6, 0]}>
+        <boxGeometry args={[0.9, 12, 0.9]} />
+        <meshStandardMaterial color="#1e1b4b" flatShading roughness={0.3} />
+      </mesh>
+
+      {/* Crossbar Arch Span */}
+      <mesh castShadow position={[0, 11.5, 0]}>
+        <boxGeometry args={[12.2, 1.6, 0.95]} />
+        <meshStandardMaterial color="#0f172a" flatShading roughness={0.4} />
+      </mesh>
+      {/* Neon glowing outline frame */}
+      <mesh position={[0, 11.5, 0]}>
+        <boxGeometry args={[12.35, 1.75, 0.85]} />
+        <meshStandardMaterial color="#7c3aed" emissive="#7c3aed" emissiveIntensity={0.8} />
+      </mesh>
+
+      {/* Front Glowing 3D Text: JOSHUVA'S WORLD */}
+      <Text
+        position={[0, 11.5, 0.52]}
+        fontSize={0.65}
+        color="#ffffff"
+        anchorX="center"
+        anchorY="middle"
+        letterSpacing={0.15}
+        outlineWidth={0.04}
+        outlineColor="#4c1d95"
+      >
+        ✦ JOSHUVA'S WORLD ✦
+      </Text>
+
+      {/* Back Glowing 3D Text: JOSHUVA'S WORLD */}
+      <Text
+        position={[0, 11.5, -0.52]}
+        rotation={[0, Math.PI, 0]}
+        fontSize={0.65}
+        color="#ffffff"
+        anchorX="center"
+        anchorY="middle"
+        letterSpacing={0.15}
+        outlineWidth={0.04}
+        outlineColor="#4c1d95"
+      >
+        ✦ JOSHUVA'S WORLD ✦
+      </Text>
+
+      {/* Beacon Lights on top of pillars */}
+      {[-5.5, 5.5].map((x, i) => (
+        <group key={i} position={[x, 12.4, 0]}>
+          <mesh>
+            <cylinderGeometry args={[0.1, 0.15, 0.4, 6]} />
+            <meshStandardMaterial color="#64748b" />
+          </mesh>
+          <mesh position={[0, 0.28, 0]}>
+            <sphereGeometry args={[0.2, 8, 8]} />
+            <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={3} />
+          </mesh>
+        </group>
+      ))}
+    </group>
   )
 }
 
-// ── Road markings ─────────────────────────────────────────────────────────────
-function RoadMarkings() {
-  const dashes: [number, number, number][] = []
-  for (let z = -18; z < 18; z += 3) dashes.push([0, 0.05, z]) // center N-S road
-  for (let x = -18; x < 18; x += 3) dashes.push([x, 0.05, 0]) // center E-W road
+// ── In-World Controls Sign Board at Spawn Arch ────────────────────────────────
+function InstructionBoard({ position }: { position: [number, number, number] }) {
   return (
-    <>
-      {dashes.map(([x, y, z], i) => (
-        <mesh key={i} position={[x, y, z]}>
-          <boxGeometry args={[0.12, 0.01, 1.2]} />
-          <meshStandardMaterial color="#f3f4f6" emissive="#f3f4f6" emissiveIntensity={0.2} />
-        </mesh>
-      ))}
-    </>
+    <group position={position}>
+      {/* Post */}
+      <mesh castShadow position={[0, 1.4, 0]}>
+        <cylinderGeometry args={[0.06, 0.08, 2.8, 8]} />
+        <meshStandardMaterial color="#1e1b4b" roughness={0.5} metalness={0.4} />
+      </mesh>
+      {/* Panel backing */}
+      <mesh castShadow position={[0, 3.2, 0]}>
+        <boxGeometry args={[3.4, 2.0, 0.1]} />
+        <meshStandardMaterial color="#0a0720" roughness={0.4} metalness={0.3} />
+      </mesh>
+      {/* Violet glow border */}
+      <mesh position={[0, 3.2, 0.01]}>
+        <boxGeometry args={[3.46, 2.06, 0.06]} />
+        <meshStandardMaterial color="#7c3aed" emissive="#7c3aed" emissiveIntensity={0.7} />
+      </mesh>
+      <Text position={[0, 4.0, 0.12]} fontSize={0.22} color="#a78bfa" anchorX="center" anchorY="middle" letterSpacing={0.1}>
+        🎮 CONTROLS
+      </Text>
+      <Text position={[0, 3.62, 0.12]} fontSize={0.155} color="#f1f5f9" anchorX="center" anchorY="middle">
+        W / ↑  ·  Accelerate
+      </Text>
+      <Text position={[0, 3.36, 0.12]} fontSize={0.155} color="#f1f5f9" anchorX="center" anchorY="middle">
+        S / ↓  ·  Brake / Reverse
+      </Text>
+      <Text position={[0, 3.10, 0.12]} fontSize={0.155} color="#f1f5f9" anchorX="center" anchorY="middle">
+        A / D  ·  Steer Left / Right
+      </Text>
+      <Text position={[0, 2.84, 0.12]} fontSize={0.155} color="#38bdf8" anchorX="center" anchorY="middle">
+        Enter  ·  Zoom Into Station
+      </Text>
+      <Text position={[0, 2.58, 0.12]} fontSize={0.155} color="#34d399" anchorX="center" anchorY="middle">
+        Esc  ·  Exit Station
+      </Text>
+      <Text position={[0, 2.32, 0.12]} fontSize={0.155} color="#fbbf24" anchorX="center" anchorY="middle">
+        N / P  ·  Next / Prev Station
+      </Text>
+    </group>
   )
 }
 
 export default function World() {
   return (
     <group>
-      {/* Ground plane */}
-      <RigidBody type="fixed" colliders="cuboid">
-        <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]}>
-          <planeGeometry args={[80, 80]} />
-          <meshStandardMaterial color="#4ade80" flatShading />
-        </mesh>
-        {/* Invisible thick ground collider */}
-        <mesh visible={false} position={[0, -1, 0]}>
-          <boxGeometry args={[80, 2, 80]} />
-          <meshStandardMaterial />
-        </mesh>
-      </RigidBody>
-
-      {/* Roads */}
-      {/* Main North-South road */}
-      <RoadSegment position={[0, 0, 0]} width={5} depth={50} />
-      {/* Main East-West road */}
-      <RoadSegment position={[0, 0, 0]} width={50} depth={5} />
-      {/* Branch roads to stations */}
-      <RoadSegment position={[9, 0, 2]} width={13} depth={4} />
-      <RoadSegment position={[-9, 0, -4]} width={13} depth={4} />
-
-      <RoadMarkings />
-
-      {/* Parking bay highlights near stations */}
-      <mesh position={[14, 0.01, 2]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[5, 5]} />
-        <meshStandardMaterial color="#312e81" transparent opacity={0.35} />
-      </mesh>
-      <mesh position={[-14, 0.01, -4]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[5, 5]} />
-        <meshStandardMaterial color="#1e1b4b" transparent opacity={0.35} />
-      </mesh>
-      <mesh position={[2, 0.01, -16]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[5, 5]} />
-        <meshStandardMaterial color="#042f2e" transparent opacity={0.35} />
+      {/* Landscape Ground terrain */}
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]}>
+        <planeGeometry args={[100, 100]} />
+        <meshStandardMaterial color="#10b981" roughness={0.8} />
       </mesh>
 
-      {/* Trees */}
+      {/* Grand Entry Landmark: JOSHUVA'S WORLD */}
+      <JoshuvasWorldArch position={[0, 0, 18]} />
+
+      {/* In-World Controls Board at spawn point */}
+      <InstructionBoard position={[-6, 0, 17]} />
+
+      {/* ── Cyber Highway Roadway Network ──────────────────────────────────── */}
+      <CyberHighway />
+
+      {/* ── High Altitude Floating Clouds ─────────────────────────────── */}
+      <LowPolyCloud position={[-15, 14, 10]} scale={1.8} speed={0.4} />
+      <LowPolyCloud position={[18, 16, 12]} scale={2.2} speed={0.5} />
+      <LowPolyCloud position={[5, 15, -14]} scale={1.6} speed={0.3} />
+      <LowPolyCloud position={[-20, 13, -15]} scale={2.0} speed={0.45} />
+      <LowPolyCloud position={[22, 17, -5]} scale={1.7} speed={0.35} />
+
+      {/* ── Trees ────────────────────────────────────────────────────── */}
       <Tree position={[4, 0, 4]} />
       <Tree position={[-4, 0, 4]} />
       <Tree position={[4, 0, -4]} />
@@ -222,62 +410,20 @@ export default function World() {
       <Tree position={[-8, 0, 8]} />
       <Tree position={[8, 0, -8]} />
       <Tree position={[-8, 0, -8]} />
-      <Tree position={[18, 0, 12]} />
-      <Tree position={[-18, 0, 12]} />
-      <Tree position={[18, 0, -12]} />
-      <Tree position={[-18, 0, -12]} />
-      <Tree position={[18, 0, 18]} />
-      <Tree position={[-18, 0, 18]} />
-      <Tree position={[5, 0, 18]} />
-      <Tree position={[-5, 0, 18]} />
-      <Tree position={[5, 0, -18]} />
-      <Tree position={[-5, 0, -18]} />
+      <Tree position={[18, 0, 15]} />
+      <Tree position={[-18, 0, 15]} />
+      <Tree position={[18, 0, -15]} />
+      <Tree position={[-18, 0, -15]} />
+      <Tree position={[22, 0, 2]} />
+      <Tree position={[-22, 0, 2]} />
 
-      {/* Lamp posts */}
-      <LampPost position={[3, 0, 8]} />
-      <LampPost position={[-3, 0, 8]} />
-      <LampPost position={[3, 0, -8]} />
-      <LampPost position={[-3, 0, -8]} />
-      <LampPost position={[3, 0, 0]} />
-      <LampPost position={[-3, 0, 0]} />
-      <LampPost position={[10, 0, 3]} />
-      <LampPost position={[-10, 0, -3]} />
-
-      {/* Ambient background buildings (non-interactive) */}
-      <AmbientBuilding position={[20, 0, 5]} width={4} depth={4} height={4} color="#64748b" />
-      <AmbientBuilding position={[22, 0, -3]} width={3} depth={3} height={6} color="#475569" />
-      <AmbientBuilding position={[-20, 0, 6]} width={5} depth={4} height={3} color="#6b7280" />
-      <AmbientBuilding position={[-22, 0, -5]} width={3} depth={3} height={5} color="#52525b" />
-      <AmbientBuilding position={[6, 0, -20]} width={4} depth={4} height={4} color="#4b5563" />
-      <AmbientBuilding position={[-5, 0, -22]} width={3} depth={5} height={3} color="#374151" />
-      <AmbientBuilding position={[6, 0, 20]} width={4} depth={3} height={3} color="#3f3f46" />
-      <AmbientBuilding position={[-6, 0, 20]} width={3} depth={4} height={5} color="#52525b" />
-
-      {/* ── Direction Signs ─────────────────────────────────────────── */}
-      {/* Projects → East (right arrow). Roadside near east junction. */}
-      <DirectionSign
-        position={[3.5, 0, -2.5]}
-        rotation={[0, 0, 0]}
-        label="Projects"
-        color="#7c3aed"
-        arrowDir="right"
-      />
-      {/* About → West (left arrow). Roadside near west junction. */}
-      <DirectionSign
-        position={[-3.5, 0, 2.5]}
-        rotation={[0, Math.PI, 0]}
-        label="About"
-        color="#4f46e5"
-        arrowDir="right"
-      />
-      {/* Contact → North (points North along road). Roadside near junction. */}
-      <DirectionSign
-        position={[3.5, 0, 2.5]}
-        rotation={[0, -Math.PI / 2, 0]}
-        label="Contact"
-        color="#0d9488"
-        arrowDir="left"
-      />
+      {/* ── Ambient Background Architecture ──────────────────────────── */}
+      <AmbientBuilding position={[24, 0, 8]} width={5} depth={5} height={5} color="#475569" />
+      <AmbientBuilding position={[25, 0, -6]} width={4} depth={4} height={7} color="#334155" />
+      <AmbientBuilding position={[-24, 0, 8]} width={5} depth={4} height={4} color="#475569" />
+      <AmbientBuilding position={[-25, 0, -8]} width={4} depth={4} height={6} color="#334155" />
+      <AmbientBuilding position={[10, 0, -22]} width={4} depth={4} height={5} color="#1e293b" />
+      <AmbientBuilding position={[-8, 0, -23]} width={4} depth={5} height={4} color="#334155" />
     </group>
   )
 }
